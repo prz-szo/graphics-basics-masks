@@ -15,19 +15,11 @@ class AppGUI : public AppGUIBase {
 protected:
     // Handlers for AppGUIBase events.
     void readImgPath(wxCommandEvent &event);
-
     void readMaskPath(wxCommandEvent &event);
-
     void changeTransparencyColor(wxColourPickerEvent &event);
-
     void changeApplyingMethod(wxCommandEvent &event);
-
-    void invertMask(wxCommandEvent &event);
-
     void applyMask(wxCommandEvent &event);
-
     void changeAlphaLevel(wxScrollEvent &event);
-
     void updateCanvas(wxUpdateUIEvent &event);
 
 public:
@@ -39,6 +31,16 @@ private:
     wxImage image;
     wxImage imageCopy;
     wxImage mask;
+    wxColour transparencyColor;
+    enum ApplyingMethod {CHANGE_COLORS=0, SUM_COLORS, MULTIPLY_COLORS};
+    ApplyingMethod method;
+
+    wxColour addColors(int i, int j);
+    wxColor changeColors(int i, int j);
+    wxColor multiplyColors(int i, int j);
+
+    void correctColor(int &red);
+    bool colorTransparent(int i, int j);
 
 };
 

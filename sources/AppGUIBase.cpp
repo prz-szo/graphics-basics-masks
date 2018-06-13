@@ -47,15 +47,11 @@ AppGUIBase::AppGUIBase( wxWindow* parent, wxWindowID id, const wxString& title, 
 	wxBoxSizer* bSizer7;
 	bSizer7 = new wxBoxSizer( wxVERTICAL );
 	
-	wxString applying_method_radioboxChoices[] = { wxT("Zmiana kolorów"), wxT("Mnożenie kolorów"), wxT("Sumowanie kolorów") };
+	wxString applying_method_radioboxChoices[] = { wxT("Zmiana kolorów"), wxT("Sumowanie kolorów"), wxT("Mnożenie kolorów") };
 	int applying_method_radioboxNChoices = sizeof( applying_method_radioboxChoices ) / sizeof( wxString );
 	applying_method_radiobox = new wxRadioBox( this, wxID_ANY, wxT("Metoda nakładania"), wxDefaultPosition, wxDefaultSize, applying_method_radioboxNChoices, applying_method_radioboxChoices, 1, wxRA_SPECIFY_COLS );
-	applying_method_radiobox->SetSelection( 2 );
+	applying_method_radiobox->SetSelection( 1 );
 	bSizer7->Add( applying_method_radiobox, 1, wxALL|wxEXPAND|wxALIGN_CENTER_VERTICAL, 10 );
-	
-	mask_invert_checkbox = new wxCheckBox( this, wxID_ANY, wxT("Odwróć maskę"), wxDefaultPosition, wxDefaultSize, 0 );
-	mask_invert_checkbox->SetValue(true); 
-	bSizer7->Add( mask_invert_checkbox, 0, wxALL|wxEXPAND, 5 );
 	
 	apply_mask_btn = new wxButton( this, wxID_ANY, wxT("Nałóż maskę"), wxDefaultPosition, wxDefaultSize, 0 );
 	bSizer7->Add( apply_mask_btn, 0, wxALL|wxEXPAND, 5 );
@@ -75,14 +71,11 @@ AppGUIBase::AppGUIBase( wxWindow* parent, wxWindowID id, const wxString& title, 
 	
 	alpha_level_slider = new wxSlider( this, wxID_ANY, 50, 0, 100, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL );
 	bSizer10->Add( alpha_level_slider, 1, wxALL|wxEXPAND, 5 );
-	
-	
+
 	side_bar_sizer->Add( bSizer10, 1, wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
-	
-	
+
 	side_bar_sizer->Add( 0, 0, 10, wxEXPAND, 5 );
-	
-	
+
 	bSizer1->Add( side_bar_sizer, 1, wxEXPAND|wxALIGN_CENTER_VERTICAL, 5 );
 	
 	wxBoxSizer* bSizer5;
@@ -106,7 +99,6 @@ AppGUIBase::AppGUIBase( wxWindow* parent, wxWindowID id, const wxString& title, 
 	read_mask_btn->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( AppGUIBase::readMaskPath ), NULL, this );
 	mask_color_picker->Connect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( AppGUIBase::changeTransparencyColor ), NULL, this );
 	applying_method_radiobox->Connect( wxEVT_COMMAND_RADIOBOX_SELECTED, wxCommandEventHandler( AppGUIBase::changeApplyingMethod ), NULL, this );
-	mask_invert_checkbox->Connect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( AppGUIBase::invertMask ), NULL, this );
 	apply_mask_btn->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( AppGUIBase::applyMask ), NULL, this );
 	alpha_level_slider->Connect( wxEVT_SCROLL_TOP, wxScrollEventHandler( AppGUIBase::changeAlphaLevel ), NULL, this );
 	alpha_level_slider->Connect( wxEVT_SCROLL_BOTTOM, wxScrollEventHandler( AppGUIBase::changeAlphaLevel ), NULL, this );
@@ -127,7 +119,6 @@ AppGUIBase::~AppGUIBase()
 	read_mask_btn->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( AppGUIBase::readMaskPath ), NULL, this );
 	mask_color_picker->Disconnect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( AppGUIBase::changeTransparencyColor ), NULL, this );
 	applying_method_radiobox->Disconnect( wxEVT_COMMAND_RADIOBOX_SELECTED, wxCommandEventHandler( AppGUIBase::changeApplyingMethod ), NULL, this );
-	mask_invert_checkbox->Disconnect( wxEVT_COMMAND_CHECKBOX_CLICKED, wxCommandEventHandler( AppGUIBase::invertMask ), NULL, this );
 	apply_mask_btn->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( AppGUIBase::applyMask ), NULL, this );
 	alpha_level_slider->Disconnect( wxEVT_SCROLL_TOP, wxScrollEventHandler( AppGUIBase::changeAlphaLevel ), NULL, this );
 	alpha_level_slider->Disconnect( wxEVT_SCROLL_BOTTOM, wxScrollEventHandler( AppGUIBase::changeAlphaLevel ), NULL, this );

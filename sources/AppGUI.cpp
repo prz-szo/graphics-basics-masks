@@ -3,6 +3,11 @@
 
 AppGUI::AppGUI(wxWindow *parent) : AppGUIBase(parent) {
     canvas->SetScrollbars(25, 25, 52, 40);
+    this->SetBackgroundColour(wxColor(192, 192, 192));
+    canvas->SetBackgroundColour(wxColor(192, 192, 192));
+    transparencyColor = mask_color_picker->GetColour();
+
+    method = SUM_COLORS;
 
     wxImage::AddHandler(new wxJPEGHandler);
     wxImage::AddHandler(new wxPNGHandler);
@@ -14,7 +19,7 @@ void AppGUI::readImgPath(wxCommandEvent &event) {
                                   wxFD_OPEN | wxFD_FILE_MUST_EXIST);
     wxImage imageToLoad;
     if ( WxOpenFileDialog.ShowModal() == wxID_OK ) {
-        if (!imageToLoad.LoadFile(WxOpenFileDialog.GetPath())) {
+        if ( !imageToLoad.LoadFile(WxOpenFileDialog.GetPath())) {
             wxMessageBox(_("Nie uda\u0142o si\u0119 za\u0142adowa\u0107 obrazka"));
             this->Destroy();
         } else {
@@ -30,7 +35,7 @@ void AppGUI::readMaskPath(wxCommandEvent &event) {
                                   wxFD_OPEN | wxFD_FILE_MUST_EXIST);
     wxImage maskToLoad;
     if ( WxOpenFileDialog.ShowModal() == wxID_OK ) {
-        if (!maskToLoad.LoadFile(WxOpenFileDialog.GetPath())) {
+        if ( !maskToLoad.LoadFile(WxOpenFileDialog.GetPath())) {
             wxMessageBox(_("Nie uda\u0142o si\u0119 za\u0142adowa\u0107 pliku"));
             this->Destroy();
         } else
@@ -39,15 +44,11 @@ void AppGUI::readMaskPath(wxCommandEvent &event) {
 }
 
 void AppGUI::changeTransparencyColor(wxColourPickerEvent &event) {
-// TODO: Implement changeTransparencyColor
+    transparencyColor = mask_color_picker->GetColour();
 }
 
 void AppGUI::changeApplyingMethod(wxCommandEvent &event) {
-// TODO: Implement changeApplyingMethod
-}
-
-void AppGUI::invertMask(wxCommandEvent &event) {
-// TODO: Implement invertMask
+    method = static_cast<ApplyingMethod>(applying_method_radiobox->GetSelection());
 }
 
 void AppGUI::applyMask(wxCommandEvent &event) {
@@ -56,18 +57,75 @@ void AppGUI::applyMask(wxCommandEvent &event) {
     Refresh();
 
     imageCopy = image.Copy();
-    imageCopy.SetMaskFromImage(mask, 0, 0, 0);
+    wxColor newColor;
+    for (int i = 1; i < imageCopy.GetWidth() - 1; ++i) {
+        for (int j = 1; j < imageCopy.GetHeight() - 1; ++j) {
+            if(!colorTransparent(i, j)) {
+                switch(applying_method_radiobox->GetSelection()) {
+                    case CHANGE_COLORS:
+                        newColor = changeColors(i, j);
+                        break;
+                    case SUM_COLORS:
+                        newColor = addColors(i, j);
+                        break;
+                    case MULTIPLY_COLORS:
+                        newColor = multiplyColors(i, j);
+                        break;
+                }
+                imageCopy.SetRGB(i, j, newColor.Red(), newColor.Green(), newColor.Blue());
+            }
+        }
+    }
 }
+
 
 void AppGUI::changeAlphaLevel(wxScrollEvent &event) {
 // TODO: Implement changeAlphaLevel
 }
 
 void AppGUI::updateCanvas(wxUpdateUIEvent &event) {
-    if(imageCopy.IsOk()) {
+    if ( imageCopy.IsOk()) {
         wxBitmap bitmap(imageCopy);
         wxClientDC dc(canvas);
         canvas->DoPrepareDC(dc);
         dc.DrawBitmap(bitmap, 0, 0, true);
     }
 }
+
+wxColor AppGUI::addColors(int i, int j) {
+    int red = image.GetRed(i,j) + mask.GetRed(i, j);
+    int green = image.GetGreen(i,j) + mask.GetGreen(i, j);
+    int blue = image.GetBlue(i,j) + mask.GetBlue(i, j);
+    correctColor(red);
+    correctColor(green);
+    correctColor(blue);
+    return wxColor(red, green, blue);
+}
+
+wxColor AppGUI::changeColors(int i, int j) {
+    return wxColor(mask.GetRed(i, j), mask.GetGreen(i, j), mask.GetBlue(i, j));
+}
+
+wxColor AppGUI::multiplyColors(int i, int j) {
+    int red = image.GetRed(i,j) * mask.GetRed(i, j);
+    int green = image.GetGreen(i,j) * mask.GetGreen(i, j);
+    int blue = image.GetBlue(i,j) * mask.GetBlue(i, j);
+    correctColor(red);
+    correctColor(green);
+    correctColor(blue);
+    return wxColor(red, green, blue);
+}
+
+void AppGUI::correctColor(int &computedColor) {
+    if ( computedColor > 255 )
+        computedColor = 255;
+    else if ( computedColor < 0 )
+        computedColor = 0;
+}
+
+bool AppGUI::colorTransparent(int i, int j) {
+    return mask.GetRed(i, j) == transparencyColor.Red() &&
+            mask.GetGreen(i, j) == transparencyColor.Green() &&
+            mask.GetBlue(i, j) == transparencyColor.Blue();
+}
+
