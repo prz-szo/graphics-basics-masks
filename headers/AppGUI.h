@@ -19,6 +19,7 @@ protected:
     void changeTransparencyColor(wxColourPickerEvent &event);
     void changeApplyingMethod(wxCommandEvent &event);
     void applyMask(wxCommandEvent &event);
+    void saveToFile(wxCommandEvent &event);
     void changeAlphaLevel(wxScrollEvent &event);
     void updateCanvas(wxUpdateUIEvent &event);
 

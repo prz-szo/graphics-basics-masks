@@ -32,39 +32,47 @@
 ///////////////////////////////////////////////////////////////////////////////
 /// Class AppGUIBase
 ///////////////////////////////////////////////////////////////////////////////
-class AppGUIBase : public wxFrame 
-{
-	private:
-	
-	protected:
-		wxButton* read_img_button;
-		wxButton* read_mask_btn;
-		wxColourPickerCtrl* mask_color_picker;
-		wxRadioBox* applying_method_radiobox;
-		wxCheckBox* mask_invert_checkbox;
-		wxButton* apply_mask_btn;
-		wxStaticLine* m_staticline1;
-		wxStaticText* alpha_label;
-		wxSlider* alpha_level_slider;
-		wxScrolledWindow* canvas;
-		
-		// Virtual event handlers, overide them in your derived class
-		virtual void readImgPath( wxCommandEvent& event ) { event.Skip(); }
-		virtual void readMaskPath( wxCommandEvent& event ) { event.Skip(); }
-		virtual void changeTransparencyColor( wxColourPickerEvent& event ) { event.Skip(); }
-		virtual void changeApplyingMethod( wxCommandEvent& event ) { event.Skip(); }
-		virtual void invertMask( wxCommandEvent& event ) { event.Skip(); }
-		virtual void applyMask( wxCommandEvent& event ) { event.Skip(); }
-		virtual void changeAlphaLevel( wxScrollEvent& event ) { event.Skip(); }
-		virtual void updateCanvas( wxUpdateUIEvent& event ) { event.Skip(); }
-		
-	
-	public:
-		
-		AppGUIBase( wxWindow* parent, wxWindowID id = wxID_ANY, const wxString& title = wxEmptyString, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxSize( 800,600 ), long style = wxDEFAULT_FRAME_STYLE|wxTAB_TRAVERSAL );
-		
-		~AppGUIBase();
-	
+class AppGUIBase : public wxFrame {
+private:
+
+protected:
+    wxButton *read_img_button;
+    wxButton *read_mask_btn;
+    wxColourPickerCtrl *mask_color_picker;
+    wxRadioBox *applying_method_radiobox;
+    wxButton *save_to_file;
+    wxButton *apply_mask_btn;
+    wxStaticLine *m_staticline1;
+    wxStaticText *alpha_label;
+    wxSlider *alpha_level_slider;
+    wxScrolledWindow *canvas;
+
+    // Virtual event handlers, overide them in your derived class
+    virtual void readImgPath(wxCommandEvent &event) { event.Skip(); }
+
+    virtual void readMaskPath(wxCommandEvent &event) { event.Skip(); }
+
+    virtual void changeTransparencyColor(wxColourPickerEvent &event) { event.Skip(); }
+
+    virtual void changeApplyingMethod(wxCommandEvent &event) { event.Skip(); }
+
+    virtual void applyMask(wxCommandEvent &event) { event.Skip(); }
+
+    virtual void saveToFile(wxCommandEvent &event) { event.Skip(); }
+
+    virtual void changeAlphaLevel(wxScrollEvent &event) { event.Skip(); }
+
+    virtual void updateCanvas(wxUpdateUIEvent &event) { event.Skip(); }
+
+
+public:
+
+    AppGUIBase(wxWindow *parent, wxWindowID id = wxID_ANY, const wxString &title = wxEmptyString,
+               const wxPoint &pos = wxDefaultPosition, const wxSize &size = wxSize(800, 600),
+               long style = wxDEFAULT_FRAME_STYLE | wxTAB_TRAVERSAL);
+
+    ~AppGUIBase();
+
 };
 
 #endif //__APPGUIBASE_H__

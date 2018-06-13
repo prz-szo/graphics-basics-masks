@@ -55,8 +55,10 @@ AppGUIBase::AppGUIBase( wxWindow* parent, wxWindowID id, const wxString& title, 
 	
 	apply_mask_btn = new wxButton( this, wxID_ANY, wxT("Nałóż maskę"), wxDefaultPosition, wxDefaultSize, 0 );
 	bSizer7->Add( apply_mask_btn, 0, wxALL|wxEXPAND, 5 );
-	
-	
+
+	save_to_file = new wxButton( this, wxID_ANY, wxT("Zapis do pliku"), wxDefaultPosition, wxDefaultSize, 0 );
+	bSizer7->Add( save_to_file, 0, wxALL|wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
+
 	side_bar_sizer->Add( bSizer7, 1, wxEXPAND|wxALIGN_CENTER_HORIZONTAL, 5 );
 	
 	m_staticline1 = new wxStaticLine( this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLI_HORIZONTAL );
@@ -100,7 +102,8 @@ AppGUIBase::AppGUIBase( wxWindow* parent, wxWindowID id, const wxString& title, 
 	mask_color_picker->Connect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( AppGUIBase::changeTransparencyColor ), NULL, this );
 	applying_method_radiobox->Connect( wxEVT_COMMAND_RADIOBOX_SELECTED, wxCommandEventHandler( AppGUIBase::changeApplyingMethod ), NULL, this );
 	apply_mask_btn->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( AppGUIBase::applyMask ), NULL, this );
-	alpha_level_slider->Connect( wxEVT_SCROLL_TOP, wxScrollEventHandler( AppGUIBase::changeAlphaLevel ), NULL, this );
+    save_to_file->Connect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( AppGUIBase::saveToFile ), NULL, this );
+    alpha_level_slider->Connect( wxEVT_SCROLL_TOP, wxScrollEventHandler( AppGUIBase::changeAlphaLevel ), NULL, this );
 	alpha_level_slider->Connect( wxEVT_SCROLL_BOTTOM, wxScrollEventHandler( AppGUIBase::changeAlphaLevel ), NULL, this );
 	alpha_level_slider->Connect( wxEVT_SCROLL_LINEUP, wxScrollEventHandler( AppGUIBase::changeAlphaLevel ), NULL, this );
 	alpha_level_slider->Connect( wxEVT_SCROLL_LINEDOWN, wxScrollEventHandler( AppGUIBase::changeAlphaLevel ), NULL, this );
@@ -120,7 +123,8 @@ AppGUIBase::~AppGUIBase()
 	mask_color_picker->Disconnect( wxEVT_COMMAND_COLOURPICKER_CHANGED, wxColourPickerEventHandler( AppGUIBase::changeTransparencyColor ), NULL, this );
 	applying_method_radiobox->Disconnect( wxEVT_COMMAND_RADIOBOX_SELECTED, wxCommandEventHandler( AppGUIBase::changeApplyingMethod ), NULL, this );
 	apply_mask_btn->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( AppGUIBase::applyMask ), NULL, this );
-	alpha_level_slider->Disconnect( wxEVT_SCROLL_TOP, wxScrollEventHandler( AppGUIBase::changeAlphaLevel ), NULL, this );
+    save_to_file->Disconnect( wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler( AppGUIBase::saveToFile ), NULL, this );
+    alpha_level_slider->Disconnect( wxEVT_SCROLL_TOP, wxScrollEventHandler( AppGUIBase::changeAlphaLevel ), NULL, this );
 	alpha_level_slider->Disconnect( wxEVT_SCROLL_BOTTOM, wxScrollEventHandler( AppGUIBase::changeAlphaLevel ), NULL, this );
 	alpha_level_slider->Disconnect( wxEVT_SCROLL_LINEUP, wxScrollEventHandler( AppGUIBase::changeAlphaLevel ), NULL, this );
 	alpha_level_slider->Disconnect( wxEVT_SCROLL_LINEDOWN, wxScrollEventHandler( AppGUIBase::changeAlphaLevel ), NULL, this );

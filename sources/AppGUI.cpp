@@ -1,6 +1,7 @@
 #include <wx/wx.h>
 #include "../headers/AppGUI.h"
 
+
 AppGUI::AppGUI(wxWindow *parent) : AppGUIBase(parent) {
     canvas->SetScrollbars(25, 25, 52, 40);
     this->SetBackgroundColour(wxColor(192, 192, 192));
@@ -15,32 +16,34 @@ AppGUI::AppGUI(wxWindow *parent) : AppGUIBase(parent) {
 
 void AppGUI::readImgPath(wxCommandEvent &event) {
     wxFileDialog WxOpenFileDialog(this, wxT("Wybierz obrazek"), wxT(""), wxT(""),
-                                  wxT("Pliki BMP,JPG,PNG (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png"),
+                                  wxT("Pliki BMP (*.bmp)|*.bmp;|Pliki JPG (*.jpg)|*.jpg|Pliki PNG (*.png)|*.png"),
                                   wxFD_OPEN | wxFD_FILE_MUST_EXIST);
     wxImage imageToLoad;
     if ( WxOpenFileDialog.ShowModal() == wxID_OK ) {
         if ( !imageToLoad.LoadFile(WxOpenFileDialog.GetPath())) {
             wxMessageBox(_("Nie uda\u0142o si\u0119 za\u0142adowa\u0107 obrazka"));
-            this->Destroy();
+            WxOpenFileDialog.Destroy();
         } else {
             this->image = imageToLoad.Copy();
             this->imageCopy = imageToLoad.Copy();
         }
     }
+    WxOpenFileDialog.Destroy();
 }
 
 void AppGUI::readMaskPath(wxCommandEvent &event) {
     wxFileDialog WxOpenFileDialog(this, wxT("Wybierz plik z maską"), wxT(""), wxT(""),
-                                  wxT("Pliki BMP,JPG,PNG (*.bmp;*.jpg;*.png)|*.bmp;*.jpg;*.png"),
+                                  wxT("Pliki BMP (*.bmp)|*.bmp;|Pliki JPG (*.jpg)|*.jpg|Pliki PNG (*.png)|*.png"),
                                   wxFD_OPEN | wxFD_FILE_MUST_EXIST);
     wxImage maskToLoad;
     if ( WxOpenFileDialog.ShowModal() == wxID_OK ) {
         if ( !maskToLoad.LoadFile(WxOpenFileDialog.GetPath())) {
             wxMessageBox(_("Nie uda\u0142o si\u0119 za\u0142adowa\u0107 pliku"));
-            this->Destroy();
+            WxOpenFileDialog.Destroy();
         } else
             this->mask = maskToLoad.Copy();
     }
+    WxOpenFileDialog.Destroy();
 }
 
 void AppGUI::changeTransparencyColor(wxColourPickerEvent &event) {
@@ -60,8 +63,8 @@ void AppGUI::applyMask(wxCommandEvent &event) {
     wxColor newColor;
     for (int i = 1; i < imageCopy.GetWidth() - 1; ++i) {
         for (int j = 1; j < imageCopy.GetHeight() - 1; ++j) {
-            if(!colorTransparent(i, j)) {
-                switch(applying_method_radiobox->GetSelection()) {
+            if ( !colorTransparent(i, j)) {
+                switch (applying_method_radiobox->GetSelection()) {
                     case CHANGE_COLORS:
                         newColor = changeColors(i, j);
                         break;
@@ -78,7 +81,6 @@ void AppGUI::applyMask(wxCommandEvent &event) {
     }
 }
 
-
 void AppGUI::changeAlphaLevel(wxScrollEvent &event) {
 // TODO: Implement changeAlphaLevel
 }
@@ -93,9 +95,9 @@ void AppGUI::updateCanvas(wxUpdateUIEvent &event) {
 }
 
 wxColor AppGUI::addColors(int i, int j) {
-    int red = image.GetRed(i,j) + mask.GetRed(i, j);
-    int green = image.GetGreen(i,j) + mask.GetGreen(i, j);
-    int blue = image.GetBlue(i,j) + mask.GetBlue(i, j);
+    int red = image.GetRed(i, j) + mask.GetRed(i, j);
+    int green = image.GetGreen(i, j) + mask.GetGreen(i, j);
+    int blue = image.GetBlue(i, j) + mask.GetBlue(i, j);
     correctColor(red);
     correctColor(green);
     correctColor(blue);
@@ -107,9 +109,9 @@ wxColor AppGUI::changeColors(int i, int j) {
 }
 
 wxColor AppGUI::multiplyColors(int i, int j) {
-    int red = image.GetRed(i,j) * mask.GetRed(i, j);
-    int green = image.GetGreen(i,j) * mask.GetGreen(i, j);
-    int blue = image.GetBlue(i,j) * mask.GetBlue(i, j);
+    int red = image.GetRed(i, j) * mask.GetRed(i, j);
+    int green = image.GetGreen(i, j) * mask.GetGreen(i, j);
+    int blue = image.GetBlue(i, j) * mask.GetBlue(i, j);
     correctColor(red);
     correctColor(green);
     correctColor(blue);
@@ -125,7 +127,17 @@ void AppGUI::correctColor(int &computedColor) {
 
 bool AppGUI::colorTransparent(int i, int j) {
     return mask.GetRed(i, j) == transparencyColor.Red() &&
-            mask.GetGreen(i, j) == transparencyColor.Green() &&
-            mask.GetBlue(i, j) == transparencyColor.Blue();
+           mask.GetGreen(i, j) == transparencyColor.Green() &&
+           mask.GetBlue(i, j) == transparencyColor.Blue();
 }
 
+void AppGUI::saveToFile(wxCommandEvent &event) {
+    wxFileDialog WxSaveFileDialog(this, wxT("Wybierz lokalizacje do zapisu"), wxT(""), wxT(std::tiwxDateTime().Today()),
+                                  wxT("Pliki BMP (*.bmp)|*.bmp;|Pliki JPG (*.jpg)|*.jpg|Pliki PNG (*.png)|*.png"),
+                                  wxFD_SAVE | wxFD_OVERWRITE_PROMPT, wxDefaultPosition);
+    wxImage maskToLoad;
+    if ( WxSaveFileDialog.ShowModal() == wxID_OK ) {
+        imageCopy.SaveFile(WxSaveFileDialog.GetPath());
+    }
+    WxSaveFileDialog.Destroy();
+}
