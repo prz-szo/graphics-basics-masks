@@ -132,7 +132,7 @@ bool AppGUI::colorTransparent(int i, int j) {
 }
 
 void AppGUI::saveToFile(wxCommandEvent &event) {
-    wxFileDialog WxSaveFileDialog(this, wxT("Wybierz lokalizacje do zapisu"), wxT(""), wxT(std::tiwxDateTime().Today()),
+    wxFileDialog WxSaveFileDialog(this, wxT("Wybierz lokalizacje do zapisu"), wxT(""), wxT(""),
                                   wxT("Pliki BMP (*.bmp)|*.bmp;|Pliki JPG (*.jpg)|*.jpg|Pliki PNG (*.png)|*.png"),
                                   wxFD_SAVE | wxFD_OVERWRITE_PROMPT, wxDefaultPosition);
     wxImage maskToLoad;
