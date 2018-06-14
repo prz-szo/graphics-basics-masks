@@ -3,7 +3,6 @@
 
 
 AppGUI::AppGUI(wxWindow *parent) : AppGUIBase(parent) {
-    canvas->SetScrollbars(25, 25, 52, 40);
     this->SetBackgroundColour(wxColor(192, 192, 192));
     canvas->SetBackgroundColour(wxColor(192, 192, 192));
     transparencyColor = mask_color_picker->GetColour();
@@ -26,6 +25,7 @@ void AppGUI::readImgPath(wxCommandEvent &event) {
         } else {
             this->image = imageToLoad.Copy();
             this->imageCopy = imageToLoad.Copy();
+            canvas->SetScrollbars(20, 20, image.GetWidth() / 20, image.GetHeight() / 20);
         }
     }
     WxOpenFileDialog.Destroy();
@@ -38,7 +38,11 @@ void AppGUI::readMaskPath(wxCommandEvent &event) {
     wxImage maskToLoad;
     if ( WxOpenFileDialog.ShowModal() == wxID_OK ) {
         if ( !maskToLoad.LoadFile(WxOpenFileDialog.GetPath())) {
-            wxMessageBox(_("Nie uda\u0142o si\u0119 za\u0142adowa\u0107 pliku"));
+            wxMessageBox(wxT("Nie uda\u0142o si\u0119 za\u0142adowa\u0107 pliku"));
+            WxOpenFileDialog.Destroy();
+        } else if ( image.IsOk() && ( maskToLoad.GetHeight() < image.GetHeight()
+                                      || maskToLoad.GetWidth() < image.GetWidth())) {
+            wxMessageBox(wxT("Maska nie może być mniejsza niż obraz"));
             WxOpenFileDialog.Destroy();
         } else
             this->mask = maskToLoad.Copy();
@@ -55,6 +59,9 @@ void AppGUI::changeApplyingMethod(wxCommandEvent &event) {
 }
 
 void AppGUI::applyMask(wxCommandEvent &event) {
+    if ( !image.IsOk())
+        return;
+
     SetBackgroundColour(wxColor(192, 192, 192));
     canvas->ClearBackground();
     Refresh();
@@ -63,7 +70,7 @@ void AppGUI::applyMask(wxCommandEvent &event) {
     wxColor newColor;
     for (int i = 1; i < imageCopy.GetWidth() - 1; ++i) {
         for (int j = 1; j < imageCopy.GetHeight() - 1; ++j) {
-            if ( !colorTransparent(i, j)) {
+            if ( !isColorTransparent(i, j)) {
                 switch (applying_method_radiobox->GetSelection()) {
                     case CHANGE_COLORS:
                         newColor = changeColors(i, j);
@@ -74,6 +81,9 @@ void AppGUI::applyMask(wxCommandEvent &event) {
                     case MULTIPLY_COLORS:
                         newColor = multiplyColors(i, j);
                         break;
+                    case SUBTRACT_COLORS:
+                        newColor = subtractColors(i, j);
+                        break;
                 }
                 imageCopy.SetRGB(i, j, newColor.Red(), newColor.Green(), newColor.Blue());
             }
@@ -82,7 +92,7 @@ void AppGUI::applyMask(wxCommandEvent &event) {
 }
 
 void AppGUI::changeAlphaLevel(wxScrollEvent &event) {
-// TODO: Implement changeAlphaLevel
+    applyMask(event);
 }
 
 void AppGUI::updateCanvas(wxUpdateUIEvent &event) {
@@ -94,24 +104,41 @@ void AppGUI::updateCanvas(wxUpdateUIEvent &event) {
     }
 }
 
-wxColor AppGUI::addColors(int i, int j) {
-    int red = image.GetRed(i, j) + mask.GetRed(i, j);
-    int green = image.GetGreen(i, j) + mask.GetGreen(i, j);
-    int blue = image.GetBlue(i, j) + mask.GetBlue(i, j);
+wxColor AppGUI::addColors(int &i, int &j) {
+    const float alpha = static_cast<const float>(alpha_level_slider->GetValue() / 100.);
+    int red = image.GetRed(i, j) + ( 1. - alpha)*mask.GetRed(i, j);
+    int green = image.GetGreen(i, j) + ( 1. - alpha)*mask.GetGreen(i, j);
+    int blue = image.GetBlue(i, j) + ( 1. - alpha)*mask.GetBlue(i, j);
+    correctColor(red);
+    correctColor(green);
+    correctColor(blue);
+    return wxColor(red, green, blue, alpha);
+}
+
+wxColor AppGUI::changeColors(int &i, int &j) {
+    const float alpha = static_cast<const float>(alpha_level_slider->GetValue() / 100.);
+    int red = (alpha * image.GetRed(i, j) + ( 1. - alpha) * mask.GetRed(i, j));
+    int green = (alpha * image.GetGreen(i, j) + ( 1. - alpha) * mask.GetGreen(i, j));
+    int blue = (alpha * image.GetBlue(i, j) + ( 1. - alpha) * mask.GetBlue(i, j));
+    return wxColor(red, green, blue);
+}
+
+wxColor AppGUI::multiplyColors(int &i, int &j) {
+    const float alpha = static_cast<const float>(alpha_level_slider->GetValue() / 100.);
+    int red = image.GetRed(i, j) * ( 1. - alpha)*mask.GetRed(i, j);
+    int green = image.GetGreen(i, j) * ( 1. - alpha)*mask.GetGreen(i, j);
+    int blue = image.GetBlue(i, j) * ( 1. - alpha)*mask.GetBlue(i, j);
     correctColor(red);
     correctColor(green);
     correctColor(blue);
     return wxColor(red, green, blue);
 }
 
-wxColor AppGUI::changeColors(int i, int j) {
-    return wxColor(mask.GetRed(i, j), mask.GetGreen(i, j), mask.GetBlue(i, j));
-}
-
-wxColor AppGUI::multiplyColors(int i, int j) {
-    int red = image.GetRed(i, j) * mask.GetRed(i, j);
-    int green = image.GetGreen(i, j) * mask.GetGreen(i, j);
-    int blue = image.GetBlue(i, j) * mask.GetBlue(i, j);
+wxColour AppGUI::subtractColors(int &i, int &j) {
+    const float alpha = static_cast<const float>(alpha_level_slider->GetValue() / 100.);
+    int red = image.GetRed(i, j) - ( 1. - alpha)*mask.GetRed(i, j);
+    int green = image.GetGreen(i, j) - ( 1. - alpha)*mask.GetGreen(i, j);
+    int blue = image.GetBlue(i, j) - ( 1. - alpha)*mask.GetBlue(i, j);
     correctColor(red);
     correctColor(green);
     correctColor(blue);
@@ -125,13 +152,16 @@ void AppGUI::correctColor(int &computedColor) {
         computedColor = 0;
 }
 
-bool AppGUI::colorTransparent(int i, int j) {
+bool AppGUI::isColorTransparent(int &i, int &j) {
     return mask.GetRed(i, j) == transparencyColor.Red() &&
            mask.GetGreen(i, j) == transparencyColor.Green() &&
            mask.GetBlue(i, j) == transparencyColor.Blue();
 }
 
 void AppGUI::saveToFile(wxCommandEvent &event) {
+    if ( !image.IsOk())
+        return;
+
     wxFileDialog WxSaveFileDialog(this, wxT("Wybierz lokalizacje do zapisu"), wxT(""), wxT(""),
                                   wxT("Pliki BMP (*.bmp)|*.bmp;|Pliki JPG (*.jpg)|*.jpg|Pliki PNG (*.png)|*.png"),
                                   wxFD_SAVE | wxFD_OVERWRITE_PROMPT, wxDefaultPosition);

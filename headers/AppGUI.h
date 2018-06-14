@@ -33,16 +33,16 @@ private:
     wxImage imageCopy;
     wxImage mask;
     wxColour transparencyColor;
-    enum ApplyingMethod {CHANGE_COLORS=0, SUM_COLORS, MULTIPLY_COLORS};
+    enum ApplyingMethod {CHANGE_COLORS=0, SUM_COLORS, MULTIPLY_COLORS, SUBTRACT_COLORS};
     ApplyingMethod method;
 
-    wxColour addColors(int i, int j);
-    wxColor changeColors(int i, int j);
-    wxColor multiplyColors(int i, int j);
+    wxColor addColors(int& i, int& j);
+    wxColor changeColors(int& i, int& j);
+    wxColor multiplyColors(int& i, int& j);
+    wxColor subtractColors(int &i, int &j);
 
-    void correctColor(int &red);
-    bool colorTransparent(int i, int j);
-
+    void correctColor(int &computedColor);
+    bool isColorTransparent(int &i, int &j);
 };
 
 #endif // __AppGUI__

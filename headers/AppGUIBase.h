@@ -49,21 +49,13 @@ protected:
 
     // Virtual event handlers, overide them in your derived class
     virtual void readImgPath(wxCommandEvent &event) { event.Skip(); }
-
     virtual void readMaskPath(wxCommandEvent &event) { event.Skip(); }
-
     virtual void changeTransparencyColor(wxColourPickerEvent &event) { event.Skip(); }
-
     virtual void changeApplyingMethod(wxCommandEvent &event) { event.Skip(); }
-
     virtual void applyMask(wxCommandEvent &event) { event.Skip(); }
-
     virtual void saveToFile(wxCommandEvent &event) { event.Skip(); }
-
     virtual void changeAlphaLevel(wxScrollEvent &event) { event.Skip(); }
-
     virtual void updateCanvas(wxUpdateUIEvent &event) { event.Skip(); }
-
 
 public:
 
