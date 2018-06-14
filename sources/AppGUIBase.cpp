@@ -49,7 +49,9 @@ AppGUIBase::AppGUIBase(wxWindow *parent, wxWindowID id, const wxString &title, c
     bSizer7 = new wxBoxSizer(wxVERTICAL);
 
     wxString applying_method_radioboxChoices[] = {wxT("Zmiana kolorów"), wxT("Sumowanie kolorów"),
-                                                  wxT("Mnożenie kolorów"), wxT("Odejmowanie kolorów")};
+                                                  wxT("Mnożenie kolorów"), wxT("Odejmowanie kolorów"),
+                                                  wxT("Tylko jaśniejsze"), wxT("Tylko ciemniejsze"),
+                                                  wxT("Różnica")};
     int applying_method_radioboxNChoices = sizeof(applying_method_radioboxChoices) / sizeof(wxString);
     applying_method_radiobox = new wxRadioBox(this, wxID_ANY, wxT("Metoda nakładania"), wxDefaultPosition,
                                               wxDefaultSize, applying_method_radioboxNChoices,
@@ -95,7 +97,6 @@ AppGUIBase::AppGUIBase(wxWindow *parent, wxWindowID id, const wxString &title, c
 
     bSizer1->Add(bSizer5, 5, wxEXPAND, 5);
 
-
     this->SetSizer(bSizer1);
     this->Layout();
 
@@ -110,15 +111,9 @@ AppGUIBase::AppGUIBase(wxWindow *parent, wxWindowID id, const wxString &title, c
                                       wxCommandEventHandler(AppGUIBase::changeApplyingMethod), NULL, this);
     apply_mask_btn->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(AppGUIBase::applyMask), NULL, this);
     save_to_file->Connect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(AppGUIBase::saveToFile), NULL, this);
-    alpha_level_slider->Connect(wxEVT_SCROLL_TOP, wxScrollEventHandler(AppGUIBase::changeAlphaLevel), NULL, this);
-    alpha_level_slider->Connect(wxEVT_SCROLL_BOTTOM, wxScrollEventHandler(AppGUIBase::changeAlphaLevel), NULL, this);
     alpha_level_slider->Connect(wxEVT_SCROLL_LINEUP, wxScrollEventHandler(AppGUIBase::changeAlphaLevel), NULL, this);
     alpha_level_slider->Connect(wxEVT_SCROLL_LINEDOWN, wxScrollEventHandler(AppGUIBase::changeAlphaLevel), NULL, this);
-    alpha_level_slider->Connect(wxEVT_SCROLL_PAGEUP, wxScrollEventHandler(AppGUIBase::changeAlphaLevel), NULL, this);
-    alpha_level_slider->Connect(wxEVT_SCROLL_PAGEDOWN, wxScrollEventHandler(AppGUIBase::changeAlphaLevel), NULL, this);
     alpha_level_slider->Connect(wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler(AppGUIBase::changeAlphaLevel), NULL,
-                                this);
-    alpha_level_slider->Connect(wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler(AppGUIBase::changeAlphaLevel), NULL,
                                 this);
     alpha_level_slider->Connect(wxEVT_SCROLL_CHANGED, wxScrollEventHandler(AppGUIBase::changeAlphaLevel), NULL, this);
     canvas->Connect(wxEVT_UPDATE_UI, wxUpdateUIEventHandler(AppGUIBase::updateCanvas), NULL, this);
@@ -136,18 +131,12 @@ AppGUIBase::~AppGUIBase() {
                                          wxCommandEventHandler(AppGUIBase::changeApplyingMethod), NULL, this);
     apply_mask_btn->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(AppGUIBase::applyMask), NULL, this);
     save_to_file->Disconnect(wxEVT_COMMAND_BUTTON_CLICKED, wxCommandEventHandler(AppGUIBase::saveToFile), NULL, this);
-    alpha_level_slider->Disconnect(wxEVT_SCROLL_TOP, wxScrollEventHandler(AppGUIBase::changeAlphaLevel), NULL, this);
-    alpha_level_slider->Disconnect(wxEVT_SCROLL_BOTTOM, wxScrollEventHandler(AppGUIBase::changeAlphaLevel), NULL, this);
     alpha_level_slider->Disconnect(wxEVT_SCROLL_LINEUP, wxScrollEventHandler(AppGUIBase::changeAlphaLevel), NULL, this);
     alpha_level_slider->Disconnect(wxEVT_SCROLL_LINEDOWN, wxScrollEventHandler(AppGUIBase::changeAlphaLevel), NULL,
                                    this);
-    alpha_level_slider->Disconnect(wxEVT_SCROLL_PAGEUP, wxScrollEventHandler(AppGUIBase::changeAlphaLevel), NULL, this);
-    alpha_level_slider->Disconnect(wxEVT_SCROLL_PAGEDOWN, wxScrollEventHandler(AppGUIBase::changeAlphaLevel), NULL,
-                                   this);
     alpha_level_slider->Disconnect(wxEVT_SCROLL_THUMBTRACK, wxScrollEventHandler(AppGUIBase::changeAlphaLevel), NULL,
                                    this);
-    alpha_level_slider->Disconnect(wxEVT_SCROLL_THUMBRELEASE, wxScrollEventHandler(AppGUIBase::changeAlphaLevel), NULL,
-                                   this);
+
     alpha_level_slider->Disconnect(wxEVT_SCROLL_CHANGED, wxScrollEventHandler(AppGUIBase::changeAlphaLevel), NULL,
                                    this);
     canvas->Disconnect(wxEVT_UPDATE_UI, wxUpdateUIEventHandler(AppGUIBase::updateCanvas), NULL, this);
